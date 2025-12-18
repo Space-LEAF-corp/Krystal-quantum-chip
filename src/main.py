@@ -1,5 +1,4 @@
 import argparse
-import time
 from pathlib import Path
 
 from krystal.scheduler import TriCycleScheduler
@@ -11,8 +10,13 @@ from krystal.thermal import ThermalModel
 
 from krystal.lane import LaneA, LaneB, LaneC
 
-def load_yaml(path):
-    import yaml
+from typing import Union
+
+def load_yaml(path: Union[str, Path]):
+    try:
+        import yaml
+    except ImportError:
+        raise ImportError("PyYAML is not installed. Please install it with 'pip install pyyaml'.")
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
