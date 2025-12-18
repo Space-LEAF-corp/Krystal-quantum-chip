@@ -1,0 +1,30 @@
+# Year-1: 365-day accelerated hardening schedule
+clock:
+  acceleration: 720.0  # 720x: 1 day -> 2 minutes for simulation
+
+daily:
+  calibration: true
+  thermal_cycle: {delta_C: 10, steps: 4}
+  workload_mix:
+    constraint_tasks: 0.4
+    entanglement_exercises: 0.3
+    convergence_loops: 0.3
+  firewall_shift: true
+
+weekly:
+  fault_injection:
+    timing_jitter_ns: [0.5, 1.0, 1.5]
+    photonic_loss_dB: [0.2, 0.5, 1.0]
+    harness_noise_mVrms: [1, 3, 5]
+  swap_cycles: 1
+  code_threshold_sweep: true
+
+monthly:
+  red_team: true
+  firmware_patch: "staged"
+  governance_audit: true
+
+quarterly:
+  reviews:
+    reliability_dashboards: true
+    design_deltas: "minor_only"
