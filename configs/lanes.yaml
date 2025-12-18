@@ -1,0 +1,31 @@
+# Lane roles, isolation, and thermal exits
+lanes:
+  A:
+    role: "preprocess_stabilize"
+    harness_bank: "A"
+    thermal_exit: "chassis_north"
+    isolation:
+      ground_domain: "GA"
+      firewall_above: false
+      firewall_below: true
+  B:
+    role: "entangle_route_constrain"
+    harness_bank: "B"
+    thermal_exit: "chassis_east"
+    isolation:
+      ground_domain: "GB"
+      firewall_above: true
+      firewall_below: true
+  C:
+    role: "decision_compress_verify"
+    harness_bank: "C"
+    thermal_exit: "chassis_south"
+    isolation:
+      ground_domain: "GC"
+      firewall_above: true
+      firewall_below: false
+
+interposer:
+  phase_lock_tolerance_ns: 1.0
+  photonic_loss_dB: 0.2
+  jitter_ns: 0.5
