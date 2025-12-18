@@ -1,0 +1,28 @@
+# Shifting "reverse gyroscopic sequential" firewall
+cadence:
+  basis: "time"
+  interval_seconds: 300
+  reversal_trigger:
+    anomaly_threshold: 0.15
+    max_release_delay_cycles: 2
+
+layers:
+  timing_shift:
+    micro_offsets_ns: [0.2, 0.4, 0.1, 0.3]
+    guard_intervals_ns: [5, 7, 6, 8]
+  routing_shift:
+    channel_maps:
+      - {A_to_B: "ch1", B_to_C: "ch2"}
+      - {A_to_B: "ch3", B_to_C: "ch1"}
+      - {A_to_B: "ch2", B_to_C: "ch3"}
+  key_shift:
+    challenge_bits: 128
+    rotation_passes: 4
+  syndrome_shift:
+    measure_order_sets:
+      - ["X", "Z", "Y"]
+      - ["Z", "Y", "X"]
+      - ["Y", "X", "Z"]
+  rf_shift:
+    impedance_windows_ohm: [48, 50, 52]
+    dwell_passes: 3
