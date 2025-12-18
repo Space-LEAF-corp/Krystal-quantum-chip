@@ -12,10 +12,14 @@ from krystal.lane import LaneA, LaneB, LaneC
 
 from typing import Union
 
+# Try to import yaml at the top, fallback to ImportError in load_yaml if not installed
+try:
+    import yaml
+except ImportError:
+    yaml = None
+
 def load_yaml(path: Union[str, Path]):
-    try:
-        import yaml
-    except ImportError:
+    if yaml is None:
         raise ImportError("PyYAML is not installed. Please install it with 'pip install pyyaml'.")
     with open(path, "r") as f:
         return yaml.safe_load(f)
