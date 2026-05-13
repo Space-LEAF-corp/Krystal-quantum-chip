@@ -1,0 +1,278 @@
+---
+
+Krystal Core Orbital Telemetry Specification 1.0
+
+Space LEAF Corp — Continuity & Redundancy Architecture
+Document ID: SL‑KC‑OTS‑1.0
+Version: 1.0
+Status: Draft Release
+Last Updated: 2026‑05‑13
+Author: Space LEAF Corp Engineering Division
+
+---
+
+1. Purpose
+
+This document defines the orbital geometry, telemetry structure, timing discipline, and relay‑layer requirements for the Krystal Core Satellite Mesh, serving as the redundancy and continuity layer between:
+
+• NASA Deep‑Space Laser Relay Network
+• Space LEAF Corp Infrastructure
+• Leaf Space Ground Stations
+• Public Access Nodes
+
+
+The Krystal Core layer provides civilian‑safe, low‑latency, quantum‑secure optical routing without contributing to orbital congestion.
+
+---
+
+2. System Overview
+
+The Krystal Core constellation operates as a mid‑altitude optical mesh designed to:
+
+1. Maintain session continuity for public users.
+2. Provide redundant routing for NASA and Leaf Space nodes.
+3. Preserve orbital safety through minimal physical footprint and strict pointing constraints.
+4. Maintain clock discipline through dual anchoring: NASA laser time + Leaf ground time.
+
+
+---
+
+3. Orbital Parameters (Shell 1.0)
+
+3.1 Constants
+
+• Earth Radius:R_{\text{E}} = 6371 \text{ km}
+
+• Earth Gravitational Parameter:\mu = 3.986 \times 10^{14} \text{ m}^3/\text{s}^2
+
+
+
+3.2 Krystal Core Shell 1.0
+
+• Orbit Type: Circular MEO
+• Altitude:h = 12{,}000 \text{ km}
+
+• Semi‑Major Axis:a = R_{\text{E}} + h = 18{,}371 \text{ km}
+
+• Orbital Period:T_{\text{orb}} = 2\pi \sqrt{\frac{a^3}{\mu}} \approx 6.9 \text{ h}
+
+• Inclination:i = 55^\circ
+
+
+
+---
+
+4. Constellation Geometry (Walker Delta Pattern)
+
+4.1 Configuration
+
+• Total Satellites:T = 48
+
+• Orbital Planes:P = 8
+
+• Phasing Factor:F = 1
+
+
+
+4.2 Plane Spacing
+
+\Omega_p = \Omega_0 + \frac{2\pi}{P}p
+
+
+4.3 Satellite Phasing
+
+Let \(k\) be satellite index \(0 \le k < 48\):
+
+• Plane index:p = \left\lfloor \frac{k}{6} \right\rfloor
+
+• In‑plane index:s = k \bmod 6
+
+• Argument of latitude:u_{p,s} = u_0 + \frac{2\pi}{T}(k + Fp)
+
+
+
+---
+
+5. State Vector & Propagation
+
+Each satellite maintains:
+
+\mathbf{x}(t) =
+\begin{bmatrix}
+\mathbf{r}(t) \\
+\mathbf{v}(t)
+\end{bmatrix}
+=
+\begin{bmatrix}
+x \\ y \\ z \\ \dot{x} \\ \dot{y} \\ \dot{z}
+\end{bmatrix}
+
+
+Baseline propagation:
+
+\ddot{\mathbf{r}} = -\mu \frac{\mathbf{r}}{\|\mathbf{r}\|^3}
+
+
+---
+
+6. Line‑of‑Sight (LOS) & Laser Link Constraints
+
+6.1 LOS Determination
+
+For satellites A and B:
+
+\mathbf{d}_{AB} = \mathbf{r}_B - \mathbf{r}_A
+
+
+Normalized direction:
+
+\hat{\mathbf{d}}_{AB} = \frac{\mathbf{d}_{AB}}{\|\mathbf{d}_{AB}\|}
+
+
+Projection:
+
+s = -\mathbf{r}_A \cdot \hat{\mathbf{d}}_{AB}
+
+
+Closest approach to Earth center:
+
+d_{\text{min}}^2 = \|\mathbf{r}_A\|^2 - s^2
+
+
+LOS Condition:
+
+d_{\text{min}} > R_{\text{E}}
+
+
+6.2 Example Propagation Delay
+
+Typical inter‑satellite distance:
+
+d_{AB} \approx 20{,}000 \text{ km}
+
+
+Propagation delay:
+
+\Delta t_{\text{prop}} = \frac{d_{AB}}{c} \approx 0.067 \text{ s}
+
+
+---
+
+7. Timing & Clock Discipline
+
+7.1 Clock Model
+
+t_{\text{sat}} = t_{\text{network}} + \Delta t_{\text{sat}}
+
+
+\Delta t_{\text{sat}}(t) = \Delta t_{\text{sat}}(t_0) + \dot{\Delta t}_{\text{sat}}(t - t_0)
+
+
+7.2 Accuracy Requirement
+
+|\Delta t_{\text{sat}}| \leq 50 \text{ ns}
+
+
+Nodes exceeding this threshold are excluded from NASA‑grade routing.
+
+---
+
+8. End‑to‑End Latency Model
+
+For a path with hops \((i,j)\):
+
+\Delta t_{\text{total}} = \sum_{(i,j)} \left( \frac{d_{ij}}{c} + \Delta t_{\text{proc},ij} \right)
+
+
+Example (4 hops):
+
+\Delta t_{\text{total}} \approx 0.272 \text{ s}
+
+
+---
+
+9. Routing & Redundancy Cost Function
+
+C(\text{path}) = \alpha \sum d_{ij} + \beta \sum \Delta t_{\text{proc},ij} + \gamma \sum (1 - H_{ij})
+
+
+Where:
+
+• \(H_{ij}\): link health (0–1)
+• \(\alpha, \beta, \gamma\): tunable weights
+
+
+Routing must satisfy:
+
+• LOS constraints
+• Clock accuracy
+• Safety/exclusion zones
+• NASA/Leaf priority rules
+
+
+---
+
+10. Telemetry Packet Structure
+
+Broadcast interval:
+
+\Delta t_{\text{tele}} = 1 \text{ s}
+
+
+10.1 Header
+
+• Node ID
+• Epoch time
+• Clock offset \(\Delta t_{\text{sat}}\)
+• Drift \(\dot{\Delta t}_{\text{sat}}\)
+
+
+10.2 Orbital State
+
+• Orbital elements: \(a, e, i, \Omega, \omega, M_0\)
+• Optional: compressed \(\mathbf{r}(t), \mathbf{v}(t)\)
+
+
+10.3 Link State
+
+For each neighbor:
+
+• Distance \(d_{ij}\)
+• SNR / BER
+• Health score \(H_{ij}\)
+• Link class: {NASA‑grade, public, backup‑only}
+
+
+10.4 Safety & Exclusion
+
+• Proximity alerts
+• Exclusion zone flags
+• Laser pointing constraints
+
+
+10.5 Continuity Flags
+
+• Preferred role
+• Load indicator
+• Session continuity status
+
+
+---
+
+11. Integration With NASA & Leaf Space
+
+• NASA provides time beacons and deep‑space ingress.
+• Leaf Space provides ground anchoring and public access.
+• Krystal Core provides redundant routing, continuity, and civilian safety guarantees.
+
+
+---
+
+12. Versioning
+
+• 1.0: Initial release
+• 1.1 (planned): Add quantum key distribution telemetry
+• 2.0 (planned): Multi‑shell Krystal Core expansion
+
+
+---
